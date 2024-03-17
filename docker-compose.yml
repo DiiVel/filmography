@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "filmography"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "123"
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  filmography:
+    container_name: filmography
+    build: ./
+    volumes:
+      - ./internal/repository/migrations:/app/internal/repository/migrations
+      - ./store:/app/store
+    env_file:
+      - ./config/.env
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8081"
