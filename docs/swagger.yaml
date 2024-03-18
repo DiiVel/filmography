@@ -1,0 +1,536 @@
+basePath: /
+definitions:
+  entities.ActorEntity:
+    properties:
+      birthday:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.Auth:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  entities.FilmEntity:
+    properties:
+      actors:
+        items:
+          $ref: '#/definitions/entities.ActorEntity'
+        type: array
+      description:
+        type: string
+      id:
+        type: string
+      rating:
+        type: number
+      releaseDate:
+        type: string
+      title:
+        type: string
+    type: object
+  entities.UserEntity:
+    properties:
+      id:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Simple CRUD application to test my go skills
+  title: Filmography web-application
+  version: "1.0"
+paths:
+  /actor:
+    get:
+      description: Возвращает список всех актеров.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список актеров
+          schema:
+            items:
+              $ref: '#/definitions/entities.ActorEntity'
+            type: array
+        "500":
+          description: Ошибка при получении актеров
+          schema:
+            type: string
+      summary: Возвращает список актеров
+      tags:
+      - Actor
+    post:
+      consumes:
+      - application/json
+      description: Создает нового актера на основе переданных данных.
+      parameters:
+      - description: Данные актера
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ActorEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при создании актера
+          schema:
+            type: string
+      summary: Создает актера
+      tags:
+      - Actor
+  /actor/{id}:
+    delete:
+      description: Удаляет актера с указанным ID.
+      parameters:
+      - description: ID актера
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении актера
+          schema:
+            type: string
+      summary: Удаляет актера
+      tags:
+      - Actor
+    get:
+      description: Возвращает информацию об актере по указанному ID.
+      parameters:
+      - description: ID актера
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация об актере
+          schema:
+            $ref: '#/definitions/entities.ActorEntity'
+        "500":
+          description: Ошибка при получении актера
+          schema:
+            type: string
+      summary: Возвращает информацию об актере
+      tags:
+      - Actor
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию об актере с указанным ID на основе переданных
+        данных.
+      parameters:
+      - description: ID актера
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Данные актера
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ActorEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при обновлении актера
+          schema:
+            type: string
+      summary: Обновляет информацию об актере
+      tags:
+      - Actor
+  /admin/auth/logout:
+    post:
+      description: Allows a user to log out and invalidate their access token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: User logout
+      tags:
+      - Auth
+  /admin/auth/refresh:
+    get:
+      description: Allows refreshing an access token using a valid refresh token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New access token response
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Refresh access token
+      tags:
+      - Auth
+  /admin/auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to sign in with their credentials.
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Auth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Access token response
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: User sign-in
+      tags:
+      - Auth
+  /film:
+    get:
+      description: Возвращает список всех фильмов.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список фильмов
+          schema:
+            items:
+              $ref: '#/definitions/entities.FilmEntity'
+            type: array
+        "500":
+          description: Ошибка при получении фильмов
+          schema:
+            type: string
+      summary: Возвращает список фильмов
+      tags:
+      - Film
+    post:
+      consumes:
+      - application/json
+      description: Создает новый фильм на основе переданных данных.
+      parameters:
+      - description: Данные фильма
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/entities.FilmEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при создании фильма
+          schema:
+            type: string
+      summary: Создает фильм.
+      tags:
+      - Film
+  /film/{id}:
+    delete:
+      description: Удаляет фильм с указанным ID.
+      parameters:
+      - description: ID фильма
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении фильма
+          schema:
+            type: string
+      summary: Удаляет фильм
+      tags:
+      - Film
+    get:
+      description: Возвращает информацию о фильме по указанному ID.
+      parameters:
+      - description: ID фильма
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о фильме
+          schema:
+            $ref: '#/definitions/entities.FilmEntity'
+        "500":
+          description: Ошибка при получении фильма
+          schema:
+            type: string
+      summary: Возвращает информацию о фильме
+      tags:
+      - Film
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о фильме с указанным ID на основе переданных
+        данных.
+      parameters:
+      - description: ID фильма
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Данные фильма
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/entities.FilmEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при обновлении фильма
+          schema:
+            type: string
+      summary: Обновляет информацию о фильме
+      tags:
+      - Film
+  /user:
+    get:
+      description: Возвращает список всех юзеров.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список юзеров
+          schema:
+            items:
+              $ref: '#/definitions/entities.UserEntity'
+            type: array
+        "500":
+          description: Ошибка при получении юзеров
+          schema:
+            type: string
+      summary: Возвращает список юзеров
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Создает нового юзера на основе переданных данных.
+      parameters:
+      - description: Данные юзера
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entities.UserEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при создании юзера
+          schema:
+            type: string
+      summary: Создает юзера.
+      tags:
+      - User
+  /user/{id}:
+    delete:
+      description: Удаляет юзера с указанным ID.
+      parameters:
+      - description: ID юзера
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении юзера
+          schema:
+            type: string
+      summary: Удаляет юзера
+      tags:
+      - User
+    get:
+      description: Возвращает информацию о юзере по указанному ID.
+      parameters:
+      - description: ID юзера
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о юзере
+          schema:
+            $ref: '#/definitions/entities.UserEntity'
+        "500":
+          description: Ошибка при получении юзере
+          schema:
+            type: string
+      summary: Возвращает информацию о юзере
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о юзере с указанным ID на основе переданных
+        данных.
+      parameters:
+      - description: ID юзера
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Данные юзера
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entities.UserEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при обновлении юзера
+          schema:
+            type: string
+      summary: Обновляет информацию о юзере
+      tags:
+      - User
+swagger: "2.0"
