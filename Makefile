@@ -1,5 +1,5 @@
 .PHONY: build
 build:
-	go build -v ./cmd/filmography
+	go build -v ./app/filmography
 
 .DEFAULT_GOAL : build

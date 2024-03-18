@@ -18,10 +18,9 @@ services:
     build: ./
     volumes:
       - ./internal/repository/migrations:/app/internal/repository/migrations
-      - ./store:/app/store
     env_file:
       - ./config/.env
     depends_on:
       - postgres
     ports:
-      - "8081:8081"
+      - "8080:8080"

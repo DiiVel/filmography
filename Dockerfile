@@ -11,5 +11,4 @@ RUN go build -o main ./app
 
 EXPOSE 8080
 
-# Command to run the application
 CMD ["./main"]

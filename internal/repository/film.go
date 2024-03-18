@@ -5,6 +5,8 @@ import (
 	"filmography/internal/entities"
 	"fmt"
 	"time"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func (r Repo) CreateFilm(ctx context.Context, film entities.FilmEntity) error {
@@ -41,7 +43,7 @@ func (r Repo) GetFilms(ctx context.Context) ([]entities.FilmEntity, error) {
 		films = append(films, film)
 	}
 
-	return actors, nil
+	return films, nil
 }
 
 func (r Repo) GetFilm(ctx context.Context, id string) (entities.FilmEntity, error) {
@@ -76,7 +78,7 @@ func (r Repo) UpdateFilm(ctx context.Context, id string, film entities.FilmEntit
 		return fmt.Errorf("rows affected failed: %w", err)
 	}
 	if num == 0 {
-		return fmt.Errorf("actor does not exists")
+		return fmt.Errorf("film does not exists")
 	}
 	return nil
 }
@@ -95,7 +97,7 @@ func (r Repo) DeleteFilm(ctx context.Context, id string) error {
 		return fmt.Errorf("rows affected failed: %w", err)
 	}
 	if num == 0 {
-		return fmt.Errorf("actor does not exists")
+		return fmt.Errorf("film does not exists")
 	}
 	return nil
 }

@@ -5,6 +5,8 @@ import (
 	"filmography/internal/entities"
 	"fmt"
 	"time"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func (r Repo) CreateActor(ctx context.Context, actor entities.ActorEntity) error {
@@ -38,6 +40,12 @@ func (r Repo) GetActors(ctx context.Context) ([]entities.ActorEntity, error) {
 			return nil, fmt.Errorf("scan failed: %w", err)
 		}
 
+		films, err := r.GetFilmsByActor(ctx, actor.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get films for actor: %w", err)
+		}
+
+		actor.Films = films
 		actors = append(actors, actor)
 	}
 
@@ -48,7 +56,7 @@ func (r Repo) GetActor(ctx context.Context, id string) (entities.ActorEntity, er
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	row := r.db.QueryRowContext(queryCtx, "SELECT * FROM actors")
+	row := r.db.QueryRowContext(queryCtx, "SELECT * FROM actors WHERE id = $1", id)
 	if row.Err() != nil {
 		return entities.ActorEntity{}, fmt.Errorf("query context failed: %w", row.Err())
 	}
@@ -59,7 +67,39 @@ func (r Repo) GetActor(ctx context.Context, id string) (entities.ActorEntity, er
 		return entities.ActorEntity{}, fmt.Errorf("scan failed: %w", err)
 	}
 
+	films, err := r.GetFilmsByActor(ctx, id)
+	if err != nil {
+		return entities.ActorEntity{}, fmt.Errorf("failed to get films for actor: %w", err)
+	}
+
+	actor.Films = films
+
 	return actor, nil
+}
+
+func (r Repo) GetFilmsByActor(ctx context.Context, actorID string) ([]entities.FilmEntity, error) {
+	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	rows, err := r.db.QueryContext(queryCtx, "SELECT films.* FROM films INNER JOIN actors_films ON films.id = actors_films.film_id WHERE actors_films.actor_id = $1", actorID)
+	if err != nil {
+		return nil, fmt.Errorf("query context failed: %w", err)
+	}
+	defer rows.Close()
+
+	films := make([]entities.FilmEntity, 0)
+
+	for rows.Next() {
+		film := entities.FilmEntity{}
+		err := rows.Scan(&film.ID, &film.Title, &film.ReleaseDate)
+		if err != nil {
+			return nil, fmt.Errorf("scan failed: %w", err)
+		}
+
+		films = append(films, film)
+	}
+
+	return films, nil
 }
 
 func (r Repo) UpdateActor(ctx context.Context, id string, actor entities.ActorEntity) error {

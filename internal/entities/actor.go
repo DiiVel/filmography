@@ -7,4 +7,5 @@ type ActorEntity struct {
 	Name     string
 	Gender   string
 	Birthday time.Time
+	Films    []FilmEntity
 }

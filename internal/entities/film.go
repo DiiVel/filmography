@@ -8,4 +8,5 @@ type FilmEntity struct {
 	Description string
 	ReleaseDate time.Time
 	Rating      float64
+	Actors      []ActorEntity
 }

@@ -17,6 +17,17 @@ type ActorService interface {
 	DeleteActor(ctx context.Context, id string) error
 }
 
+// createActor создает нового актера.
+// @Summary Создает актера
+// @Description Создает нового актера на основе переданных данных.
+// @Tags Actor
+// @Accept json
+// @Produce json
+// @Param actor body entities.ActorEntity true "Данные актера"
+// @Success 201 {object} map[string]string{"message": "actor is successfully created"}
+// @Failure 400 {string} string "Ошибка при декодировании JSON"
+// @Failure 500 {string} string "Ошибка при создании актера"
+// @Router /actor [post]
 func (handlers Handlers) createActor(w http.ResponseWriter, r *http.Request) {
 	actor := entities.ActorEntity{}
 	err := json.NewDecoder(r.Body).Decode(&actor)
@@ -43,6 +54,14 @@ func (handlers Handlers) createActor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getActors возвращает список актеров.
+// @Summary Возвращает список актеров
+// @Description Возвращает список всех актеров.
+// @Tags Actor
+// @Produce json
+// @Success 200 {array} entities.ActorEntity "Список актеров"
+// @Failure 500 {string} string "Ошибка при получении актеров"
+// @Router /actor [get]
 func (handlers Handlers) getActors(w http.ResponseWriter, r *http.Request) {
 	actors, err := handlers.svc.GetActors(r.Context())
 	if err != nil {
@@ -58,6 +77,15 @@ func (handlers Handlers) getActors(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getActor возвращает информацию об актере по его ID.
+// @Summary Возвращает информацию об актере
+// @Description Возвращает информацию об актере по указанному ID.
+// @Tags Actor
+// @Param id query string true "ID актера"
+// @Produce json
+// @Success 200 {object} entities.ActorEntity "Информация об актере"
+// @Failure 500 {string} string "Ошибка при получении актера"
+// @Router /actor/{id} [get]
 func (handlers Handlers) getActor(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	actor, err := handlers.svc.GetActor(r.Context(), id)
@@ -74,6 +102,18 @@ func (handlers Handlers) getActor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// updateActor обновляет информацию об актере.
+// @Summary Обновляет информацию об актере
+// @Description Обновляет информацию об актере с указанным ID на основе переданных данных.
+// @Tags Actor
+// @Param id query string true "ID актера"
+// @Accept json
+// @Produce json
+// @Param actor body entities.ActorEntity true "Данные актера"
+// @Success 201 {object} map[string]string{"message": "actor is successfully updated"}
+// @Failure 400 {string} string "Ошибка при декодировании JSON"
+// @Failure 500 {string} string "Ошибка при обновлении актера"
+// @Router /actor/{id} [put]
 func (handlers Handlers) updateActor(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	actor := entities.ActorEntity{}
@@ -101,6 +141,14 @@ func (handlers Handlers) updateActor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// deleteActor удаляет актера по его ID.
+// @Summary Удаляет актера
+// @Description Удаляет актера с указанным ID.
+// @Tags Actor
+// @Param id query string true "ID актера"
+// @Success 200 {object} map[string]string{"message": "actor is successfully deleted"}
+// @Failure 500 {string} string "Ошибка при удалении актера"
+// @Router /actor/{id} [delete]
 func (handlers Handlers) deleteActor(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	err := handlers.svc.DeleteActor(r.Context(), id)

@@ -3,6 +3,7 @@ package handlers
 import (
 	"filmography/config"
 	"fmt"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 )
 
@@ -23,6 +24,8 @@ type Service interface {
 func SetRequestHandlers(service Service, cfg config.Config) (*http.ServeMux, error) {
 	mux := http.NewServeMux()
 	handlers := NewHandlers(service, cfg)
+
+	mux.Handle("/swagger/", httpSwagger.Handler())
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {

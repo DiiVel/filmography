@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"time"
 )
 
 type FilmService interface {
@@ -17,16 +18,60 @@ type FilmService interface {
 	DeleteFilm(ctx context.Context, id string) error
 }
 
+type CreateFilmRequest struct {
+	Title       string                 `json:"name"`
+	Description string                 `json:"description"`
+	ReleaseDate time.Time              `json:"release_date"`
+	Rating      float64                `json:"rating"`
+	Actors      []entities.ActorEntity `json:"actors"`
+}
+
+// createFilm создает новый фильм.
+// @Summary Создает фильм.
+// @Description Создает новый фильм на основе переданных данных.
+// @Tags Film
+// @Accept json
+// @Produce json
+// @Param film body entities.FilmEntity true "Данные фильма"
+// @Success 201 {object} map[string]string{"message": "film is successfully created"}
+// @Failure 400 {string} string "Ошибка при декодировании JSON"
+// @Failure 500 {string} string "Ошибка при создании фильма"
+// @Router /film [post]
 func (handlers Handlers) createFilm(w http.ResponseWriter, r *http.Request) {
-	film := entities.FilmEntity{}
-	err := json.NewDecoder(r.Body).Decode(&film)
-	if err != nil {
+	request := CreateFilmRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, fmt.Errorf("failed to decode JSON: %w", err).Error(), http.StatusBadRequest)
 		logrus.WithField("error", err).Error("failed to decode JSON")
 		return
 	}
 
-	err = handlers.svc.CreateFilm(r.Context(), film)
+	if len(request.Title) == 0 || len(request.Title) > 150 {
+		http.Error(w, "invalid name length", http.StatusBadRequest)
+		logrus.Error("invalid name length")
+		return
+	}
+
+	if len(request.Description) > 1000 {
+		http.Error(w, "invalid description length", http.StatusBadRequest)
+		logrus.Error("invalid description length")
+		return
+	}
+
+	if request.Rating < 0 || request.Rating > 10 {
+		http.Error(w, "invalid rating value", http.StatusBadRequest)
+		logrus.Error("invalid rating value")
+		return
+	}
+
+	film := entities.FilmEntity{
+		Title:       request.Title,
+		Description: request.Description,
+		ReleaseDate: request.ReleaseDate,
+		Rating:      request.Rating,
+		Actors:      request.Actors,
+	}
+
+	err := handlers.svc.CreateFilm(r.Context(), film)
 	if err != nil {
 		http.Error(w, fmt.Errorf("failed to create film: %w", err).Error(), http.StatusInternalServerError)
 		logrus.WithField("error", err).Error("failed to create film")
@@ -35,7 +80,7 @@ func (handlers Handlers) createFilm(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	response := map[string]string{
-		"message": "actor is successfully created",
+		"message": "film is successfully created",
 	}
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
@@ -43,8 +88,16 @@ func (handlers Handlers) createFilm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getFilms возвращает список фильмов.
+// @Summary Возвращает список фильмов
+// @Description Возвращает список всех фильмов.
+// @Tags Film
+// @Produce json
+// @Success 200 {array} entities.FilmEntity "Список фильмов"
+// @Failure 500 {string} string "Ошибка при получении фильмов"
+// @Router /film [get]
 func (handlers Handlers) getFilms(w http.ResponseWriter, r *http.Request) {
-	actors, err := handlers.svc.GetFilms(r.Context())
+	films, err := handlers.svc.GetFilms(r.Context())
 	if err != nil {
 		http.Error(w, fmt.Errorf("failed to get films: %w", err).Error(), http.StatusInternalServerError)
 		logrus.WithField("error", err).Error("failed to get films")
@@ -52,15 +105,24 @@ func (handlers Handlers) getFilms(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(actors)
+	err = json.NewEncoder(w).Encode(films)
 	if err != nil {
 		return
 	}
 }
 
+// getFilm возвращает информацию о фильме по его ID.
+// @Summary Возвращает информацию о фильме
+// @Description Возвращает информацию о фильме по указанному ID.
+// @Tags Film
+// @Param id query string true "ID фильма"
+// @Produce json
+// @Success 200 {object} entities.FilmEntity "Информация о фильме"
+// @Failure 500 {string} string "Ошибка при получении фильма"
+// @Router /film/{id} [get]
 func (handlers Handlers) getFilm(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	actor, err := handlers.svc.GetFilm(r.Context(), id)
+	film, err := handlers.svc.GetFilm(r.Context(), id)
 	if err != nil {
 		http.Error(w, fmt.Errorf("failed to get film: %w", err).Error(), http.StatusInternalServerError)
 		logrus.WithField("error", err).Error("failed to get film")
@@ -68,12 +130,24 @@ func (handlers Handlers) getFilm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(actor)
+	err = json.NewEncoder(w).Encode(film)
 	if err != nil {
 		return
 	}
 }
 
+// updateFilm обновляет информацию о фильме.
+// @Summary Обновляет информацию о фильме
+// @Description Обновляет информацию о фильме с указанным ID на основе переданных данных.
+// @Tags Film
+// @Param id query string true "ID фильма"
+// @Accept json
+// @Produce json
+// @Param film body entities.FilmEntity true "Данные фильма"
+// @Success 201 {object} map[string]string{"message": "film is successfully updated"}
+// @Failure 400 {string} string "Ошибка при декодировании JSON"
+// @Failure 500 {string} string "Ошибка при обновлении фильма"
+// @Router /film/{id} [put]
 func (handlers Handlers) updateFilm(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	film := entities.FilmEntity{}
@@ -101,6 +175,14 @@ func (handlers Handlers) updateFilm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// deleteFilm удаляет фильма по его ID.
+// @Summary Удаляет фильм
+// @Description Удаляет фильм с указанным ID.
+// @Tags Film
+// @Param id query string true "ID фильма"
+// @Success 200 {object} map[string]string{"message": "film is successfully deleted"}
+// @Failure 500 {string} string "Ошибка при удалении фильма"
+// @Router /film/{id} [delete]
 func (handlers Handlers) deleteFilm(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	err := handlers.svc.DeleteFilm(r.Context(), id)
