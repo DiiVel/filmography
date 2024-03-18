@@ -40,12 +40,6 @@ func (r Repo) GetActors(ctx context.Context) ([]entities.ActorEntity, error) {
 			return nil, fmt.Errorf("scan failed: %w", err)
 		}
 
-		//films, err := r.GetFilmsByActor(ctx, actor.ID)
-		//if err != nil {
-		//	return nil, fmt.Errorf("failed to get films for actor: %w", err)
-		//}
-		//
-		//actor.Films = films
 		actors = append(actors, actor)
 	}
 
@@ -66,13 +60,6 @@ func (r Repo) GetActor(ctx context.Context, id string) (entities.ActorEntity, er
 	if err != nil {
 		return entities.ActorEntity{}, fmt.Errorf("scan failed: %w", err)
 	}
-
-	//films, err := r.GetFilmsByActor(ctx, id)
-	//if err != nil {
-	//	return entities.ActorEntity{}, fmt.Errorf("failed to get films for actor: %w", err)
-	//}
-
-	//actor.Films = films
 
 	return actor, nil
 }
