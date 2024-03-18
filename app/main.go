@@ -5,6 +5,7 @@ import (
 	"filmography/config"
 	"filmography/internal/handlers"
 	"filmography/internal/repository"
+	"filmography/internal/repository/redis"
 	"filmography/service"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -44,7 +45,14 @@ func main() {
 		}
 	}()
 
-	svc := service.New(repo)
+	cache, err := redis.New(cfg)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("redis new failed")
+	}
+
+	svc := service.New(repo, cache, cfg)
 	handlersEngine, err := handlers.SetRequestHandlers(svc, cfg)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{

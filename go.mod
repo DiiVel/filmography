@@ -13,6 +13,7 @@ require (
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
+	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-migrate/migrate/v4 v4.17.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
