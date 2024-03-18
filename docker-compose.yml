@@ -13,6 +13,17 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server --requirepass 123
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "ping" ]
+    ports:
+      - "6379:6379"
+
   filmography:
     container_name: filmography
     build: ./
