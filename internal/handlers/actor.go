@@ -24,7 +24,7 @@ type ActorService interface {
 // @Accept json
 // @Produce json
 // @Param actor body entities.ActorEntity true "Данные актера"
-// @Success 201 {object} map[string]string{"message": "actor is successfully created"}
+// @Success 201 {object} map[string]string
 // @Failure 400 {string} string "Ошибка при декодировании JSON"
 // @Failure 500 {string} string "Ошибка при создании актера"
 // @Router /actor [post]
@@ -45,9 +45,7 @@ func (handlers Handlers) createActor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	response := map[string]string{
-		"message": "actor is successfully created",
-	}
+	response := map[string]string{"message": "actor is successfully created"}
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		return
@@ -110,7 +108,7 @@ func (handlers Handlers) getActor(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param actor body entities.ActorEntity true "Данные актера"
-// @Success 201 {object} map[string]string{"message": "actor is successfully updated"}
+// @Success 201 {object} map[string]string
 // @Failure 400 {string} string "Ошибка при декодировании JSON"
 // @Failure 500 {string} string "Ошибка при обновлении актера"
 // @Router /actor/{id} [put]
@@ -146,7 +144,7 @@ func (handlers Handlers) updateActor(w http.ResponseWriter, r *http.Request) {
 // @Description Удаляет актера с указанным ID.
 // @Tags Actor
 // @Param id query string true "ID актера"
-// @Success 200 {object} map[string]string{"message": "actor is successfully deleted"}
+// @Success 200 {object} map[string]string
 // @Failure 500 {string} string "Ошибка при удалении актера"
 // @Router /actor/{id} [delete]
 func (handlers Handlers) deleteActor(w http.ResponseWriter, r *http.Request) {

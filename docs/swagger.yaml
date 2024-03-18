@@ -1,0 +1,302 @@
+basePath: /
+definitions:
+  entities.ActorEntity:
+    properties:
+      birthday:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.FilmEntity:
+    properties:
+      actors:
+        items:
+          $ref: '#/definitions/entities.ActorEntity'
+        type: array
+      description:
+        type: string
+      id:
+        type: string
+      rating:
+        type: number
+      releaseDate:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Simple CRUD application to test my go skills
+  title: Filmography web-application
+  version: "1.0"
+paths:
+  /actor:
+    get:
+      description: Возвращает список всех актеров.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список актеров
+          schema:
+            items:
+              $ref: '#/definitions/entities.ActorEntity'
+            type: array
+        "500":
+          description: Ошибка при получении актеров
+          schema:
+            type: string
+      summary: Возвращает список актеров
+      tags:
+      - Actor
+    post:
+      consumes:
+      - application/json
+      description: Создает нового актера на основе переданных данных.
+      parameters:
+      - description: Данные актера
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ActorEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при создании актера
+          schema:
+            type: string
+      summary: Создает актера
+      tags:
+      - Actor
+  /actor/{id}:
+    delete:
+      description: Удаляет актера с указанным ID.
+      parameters:
+      - description: ID актера
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении актера
+          schema:
+            type: string
+      summary: Удаляет актера
+      tags:
+      - Actor
+    get:
+      description: Возвращает информацию об актере по указанному ID.
+      parameters:
+      - description: ID актера
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация об актере
+          schema:
+            $ref: '#/definitions/entities.ActorEntity'
+        "500":
+          description: Ошибка при получении актера
+          schema:
+            type: string
+      summary: Возвращает информацию об актере
+      tags:
+      - Actor
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию об актере с указанным ID на основе переданных
+        данных.
+      parameters:
+      - description: ID актера
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Данные актера
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ActorEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при обновлении актера
+          schema:
+            type: string
+      summary: Обновляет информацию об актере
+      tags:
+      - Actor
+  /film:
+    get:
+      description: Возвращает список всех фильмов.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список фильмов
+          schema:
+            items:
+              $ref: '#/definitions/entities.FilmEntity'
+            type: array
+        "500":
+          description: Ошибка при получении фильмов
+          schema:
+            type: string
+      summary: Возвращает список фильмов
+      tags:
+      - Film
+    post:
+      consumes:
+      - application/json
+      description: Создает новый фильм на основе переданных данных.
+      parameters:
+      - description: Данные фильма
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/entities.FilmEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при создании фильма
+          schema:
+            type: string
+      summary: Создает фильм.
+      tags:
+      - Film
+  /film/{id}:
+    delete:
+      description: Удаляет фильм с указанным ID.
+      parameters:
+      - description: ID фильма
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении фильма
+          schema:
+            type: string
+      summary: Удаляет фильм
+      tags:
+      - Film
+    get:
+      description: Возвращает информацию о фильме по указанному ID.
+      parameters:
+      - description: ID фильма
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о фильме
+          schema:
+            $ref: '#/definitions/entities.FilmEntity'
+        "500":
+          description: Ошибка при получении фильма
+          schema:
+            type: string
+      summary: Возвращает информацию о фильме
+      tags:
+      - Film
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о фильме с указанным ID на основе переданных
+        данных.
+      parameters:
+      - description: ID фильма
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Данные фильма
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/entities.FilmEntity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при декодировании JSON
+          schema:
+            type: string
+        "500":
+          description: Ошибка при обновлении фильма
+          schema:
+            type: string
+      summary: Обновляет информацию о фильме
+      tags:
+      - Film
+swagger: "2.0"

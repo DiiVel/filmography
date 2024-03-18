@@ -10,6 +10,17 @@ import (
 	"net/http"
 )
 
+// @title Filmography web-application
+// @version 1.0
+// @description Simple CRUD application to test my go skills
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinition.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	cfg, err := config.New()
 	if err != nil {

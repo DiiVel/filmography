@@ -33,7 +33,7 @@ type CreateFilmRequest struct {
 // @Accept json
 // @Produce json
 // @Param film body entities.FilmEntity true "Данные фильма"
-// @Success 201 {object} map[string]string{"message": "film is successfully created"}
+// @Success 201 {object} map[string]string
 // @Failure 400 {string} string "Ошибка при декодировании JSON"
 // @Failure 500 {string} string "Ошибка при создании фильма"
 // @Router /film [post]
@@ -144,7 +144,7 @@ func (handlers Handlers) getFilm(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param film body entities.FilmEntity true "Данные фильма"
-// @Success 201 {object} map[string]string{"message": "film is successfully updated"}
+// @Success 201 {object} map[string]string
 // @Failure 400 {string} string "Ошибка при декодировании JSON"
 // @Failure 500 {string} string "Ошибка при обновлении фильма"
 // @Router /film/{id} [put]
@@ -180,7 +180,7 @@ func (handlers Handlers) updateFilm(w http.ResponseWriter, r *http.Request) {
 // @Description Удаляет фильм с указанным ID.
 // @Tags Film
 // @Param id query string true "ID фильма"
-// @Success 200 {object} map[string]string{"message": "film is successfully deleted"}
+// @Success 200 {object} map[string]string
 // @Failure 500 {string} string "Ошибка при удалении фильма"
 // @Router /film/{id} [delete]
 func (handlers Handlers) deleteFilm(w http.ResponseWriter, r *http.Request) {

@@ -25,7 +25,7 @@ func SetRequestHandlers(service Service, cfg config.Config) (*http.ServeMux, err
 	mux := http.NewServeMux()
 	handlers := NewHandlers(service, cfg)
 
-	mux.Handle("/swagger/", httpSwagger.Handler())
+	mux.Handle("/swagger/", httpSwagger.Handler(httpSwagger.URL("/docs/swagger.yaml")))
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
